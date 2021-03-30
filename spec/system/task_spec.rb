@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe 'Task', type: :system do
   let(:project) { create(:project) }
   let(:task) { create(:task) }
+  let(:task_done) { create(:task, :done) }
 
   describe 'Task一覧' do
     context '正常系' do
@@ -75,15 +76,14 @@ RSpec.describe 'Task', type: :system do
         expect(current_path).to eq project_task_path(project, task)
       end
 
-      it '既にステータスが完了のタスクのステータスを変更した場合、Taskの完了日が更新されないこと' do
+      fit '既にステータスが完了のタスクのステータスを変更した場合、Taskの完了日が更新されないこと' do
         # TODO: FactoryBotのtraitを利用してください
-        task = create(:task, project_id: project.id, status: :done, completion_date: Time.current.yesterday)
-        visit edit_project_task_path(project, task)
+        visit edit_project_task_path(project, task_done)
         select 'todo', from: 'Status'
         click_button 'Update Task'
         expect(page).to have_content('todo')
         expect(page).not_to have_content(Time.current.strftime('%Y-%m-%d'))
-        expect(current_path).to eq project_task_path(project, task)
+        expect(current_path).to eq project_task_path(project, task_done)
       end
     end
   end
